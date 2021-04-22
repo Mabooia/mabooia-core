@@ -21,6 +21,13 @@
             <organizationUrl>https://mabooia.com</organizationUrl>
         </contributor>
     </contributors>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Mabooia Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Mabooia/mabooia-core</url>
+        </repository>
+    </distributionManagement>
 
     <properties>
         <java.version>11</java.version>

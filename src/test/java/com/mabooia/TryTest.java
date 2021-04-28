@@ -45,7 +45,7 @@ public class TryTest {
     public void testSuccess() {
         // given
         final Object result = new Object();
-        final Try<Object> res = Success.of(result);
+        final Try<Object> res = Try.success(result);
 
         // then
         assertSuccess(res, result);
@@ -55,7 +55,7 @@ public class TryTest {
     public void testFailure() {
         // given
         final Exception ex = new Exception();
-        final Try<Object> res = Failure.of(ex);
+        final Try<Object> res = Try.failure(ex);
 
         // then
         assertFailure(res, ex);
@@ -86,7 +86,7 @@ public class TryTest {
     @Test
     public void testIfSuccessWhenIsSuccess() {
         // given
-        final Try<Object> res = Success.of(new Object());
+        final Try<Object> res = Try.success(new Object());
 
         @SuppressWarnings("unchecked")
         final Consumer<Object> consumer = mock(Consumer.class);
@@ -103,7 +103,7 @@ public class TryTest {
     @Test
     public void testIfSuccessWhenIsFailure() {
         // given
-        final Try<Object> res = Failure.of(new Exception());
+        final Try<Object> res = Try.failure(new Exception());
 
         @SuppressWarnings("unchecked")
         final Consumer<Object> consumer = mock(Consumer.class);
@@ -120,7 +120,7 @@ public class TryTest {
     @Test
     public void testIfFailureWhenIsFailure() {
         // given
-        final Try<Object> res = Failure.of(new Exception());
+        final Try<Object> res = Try.failure(new Exception());
 
         @SuppressWarnings("unchecked")
         final Consumer<Exception> consumer = mock(Consumer.class);
@@ -137,7 +137,7 @@ public class TryTest {
     @Test
     public void testIfFailureWhenIsSuccess() {
         // given
-        final Try<Object> res = Success.of(new Object());
+        final Try<Object> res = Try.success(new Object());
 
         @SuppressWarnings("unchecked")
         final Consumer<Exception> consumer = mock(Consumer.class);
@@ -154,7 +154,7 @@ public class TryTest {
     @Test
     public void testIfFailureWith() {
         // given
-        final Try<Object> res = Failure.of(new IOException());
+        final Try<Object> res = Try.failure(new IOException());
 
         @SuppressWarnings("unchecked")
         final Consumer<IOException> consumerOfIoException = mock(Consumer.class);
@@ -178,7 +178,7 @@ public class TryTest {
     @Test
     public void testRecoverIfFailureWith() throws Exception {
         // given
-        final Try<Object> res = Failure.of(new IOException());
+        final Try<Object> res = Try.failure(new IOException());
         final Object recoverFromNPE = new Object();
         final Object recoverFromIOE = new Object();
 
@@ -211,11 +211,11 @@ public class TryTest {
 
         @SuppressWarnings("unchecked")
         final Function<Object, Try<Object>> f = mock(Function.class);
-        when(f.apply(any())).thenReturn(Success.of(r2));
+        when(f.apply(any())).thenReturn(Try.success(r2));
 
         // when
-        final Try<Object> res2 = Success
-            .of(r1)
+        final Try<Object> res2 = Try
+            .success(r1)
             .flatMap(f);
 
         // then
@@ -228,11 +228,11 @@ public class TryTest {
         // given
         final Exception ex1 = new Exception();
         final Exception ex2 = new Exception();
-        final Try<Object> res1 = Failure.of(ex1);
+        final Try<Object> res1 = Try.failure(ex1);
 
         @SuppressWarnings("unchecked")
         final Function<Object, Try<Object>> function = mock(Function.class);
-        when(function.apply(any())).thenReturn(Failure.of(ex2));
+        when(function.apply(any())).thenReturn(Try.failure(ex2));
 
         // when
         final Try<Object> res2 = res1.flatMap(function);
@@ -246,11 +246,11 @@ public class TryTest {
     public void testFlatMapFailureWhileMapping() {
         // given
         final Exception ex = new Exception();
-        final Try<Object> res1 = Success.of(new Object());
+        final Try<Object> res1 = Try.success(new Object());
 
         @SuppressWarnings("unchecked")
         final Function<Object, Try<Object>> function = mock(Function.class);
-        when(function.apply(any())).thenReturn(Failure.of(ex));
+        when(function.apply(any())).thenReturn(Try.failure(ex));
 
         // when
         final Try<Object> res2 = res1.flatMap(function);
@@ -264,7 +264,7 @@ public class TryTest {
     public void testFlattenWhenIsFullySuccess() {
         // given
         final Object obj = new Object();
-        final Try<Try<Object>> res = Success.of(Success.of(obj));
+        final Try<Try<Object>> res = Try.success(Try.success(obj));
 
         // when
         final Try<Object> flat = Try.flatten(res);
@@ -277,7 +277,7 @@ public class TryTest {
     public void testFlattenWhenOnlyFirstLevelIsSuccess() {
         // given
         final Exception ex = new Exception();
-        final Try<Try<Object>> res = Success.of(Failure.of(ex));
+        final Try<Try<Object>> res = Try.success(Try.failure(ex));
 
         // when
         final Try<Object> flat = Try.flatten(res);
@@ -290,7 +290,7 @@ public class TryTest {
     public void testFlattenWhenFirstLevelIsFailure() {
         // given
         final Exception ex = new Exception();
-        final Try<Try<Object>> res = Failure.of(ex);
+        final Try<Try<Object>> res = Try.failure(ex);
 
         // when
         final Try<Object> flat = Try.flatten(res);
@@ -304,7 +304,7 @@ public class TryTest {
         // given
         final Object r1 = new Object();
         final Object r2 = new Object();
-        final Try<Object> res1 = Success.of(r1);
+        final Try<Object> res1 = Try.success(r1);
         final ThrowingFunction<Object, Object, ?> f = ignored -> r2;
 
         // when
@@ -318,7 +318,7 @@ public class TryTest {
     public void testMapFailureBeforeMapping() {
         // given
         final Exception ex1 = new Exception();
-        final Try<Object> res1 = Failure.of(ex1);
+        final Try<Object> res1 = Try.failure(ex1);
 
         @SuppressWarnings("unchecked")
         final ThrowingFunction<Object, Object, NullPointerException> failingFunction = mock(ThrowingFunction.class);
@@ -338,7 +338,7 @@ public class TryTest {
     @Test
     public void testMapFailureWhileMapping() {
         // given
-        final Try<Object> res1 = Success.of(new Object());
+        final Try<Object> res1 = Try.success(new Object());
         final NullPointerException ex = new NullPointerException();
         @SuppressWarnings("unchecked")
         final ThrowingFunction<Object, Object, NullPointerException> failingFunction = mock(ThrowingFunction.class);
@@ -358,7 +358,7 @@ public class TryTest {
     @Test
     public void testThrowIfFailureWhenIsSuccess() throws Exception {
         // given
-        final Try<Object> res = Success.of(new Object());
+        final Try<Object> res = Try.success(new Object());
 
         // then
         assertEquals(res, res.throwIfFailure());
@@ -368,7 +368,7 @@ public class TryTest {
     public void testThrowIfFailureWhenIsFailure() {
         // given
         final Exception ex = new Exception();
-        final Try<Object> res = Failure.of(ex);
+        final Try<Object> res = Try.failure(ex);
 
         // then
         assertEquals(
@@ -381,7 +381,7 @@ public class TryTest {
     public void testThrowIfFailureWithWhenIsFailure() {
         // given
         final IOException ex = new IOException();
-        final Try<Object> res = Failure.of(ex);
+        final Try<Object> res = Try.failure(ex);
 
         // then
         assertEquals(

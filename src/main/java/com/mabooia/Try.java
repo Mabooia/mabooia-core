@@ -11,6 +11,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public abstract class Try<T> {
 
+    public static <T> Try<T> success(final T value) {
+        return Success.of(value);
+    }
+
+    public static <T> Try<T> failure(final Exception ex) {
+        return Failure.of(ex);
+    }
+
     public static <RES extends Closeable, E extends IOException> Try<Unit> of(
         final ThrowingSupplier<RES, E> resourceSupplier,
         final ThrowingConsumer<RES, E> resourceConsumer) {
@@ -40,10 +48,10 @@ public abstract class Try<T> {
     public static <T> Try<T> of(final ThrowingSupplier<T, ? extends  Exception> supplier) {
         try {
             final T result = supplier.get();
-            return Success.of(result);
+            return success(result);
         }
         catch (final Exception ex) {
-            return Failure.of(ex);
+            return failure(ex);
         }
     }
 
@@ -53,8 +61,8 @@ public abstract class Try<T> {
             .orElseGet(() ->
                 overTry
                     .toFailureOptional()
-                    .<Try<T>>map(Failure::of)
-                    .orElseGet(() ->Failure.of(new ShouldNotReachThisPointException()))
+                    .<Try<T>>map(Try::failure)
+                    .orElseGet(() ->failure(new ShouldNotReachThisPointException()))
             );
     }
 
@@ -129,7 +137,7 @@ public abstract class Try<T> {
         return toOptional()
             .map(result -> Try.of(() -> f.apply(result)))
             .orElseGet(() ->
-                Failure.of(
+                failure(
                     toFailureOptional().orElse(new Exception("Unknown error"))
                 )
             );
@@ -194,7 +202,7 @@ final class Failure<T> extends Try<T> {
     public static <A, B> Try<B> transform(final Try<A> res) {
         return res
             .toFailureOptional()
-            .<Try<B>>map(Failure::of)
+            .<Try<B>>map(Try::failure)
             .orElseGet(() -> of(new ShouldNotReachThisPointException()));
     }
 

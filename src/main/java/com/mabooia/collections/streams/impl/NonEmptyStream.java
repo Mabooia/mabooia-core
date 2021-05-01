@@ -1,6 +1,7 @@
 package com.mabooia.collections.streams.impl;
 
 import com.mabooia.collections.streams.Stream;
+import java.util.Objects;
 import java.util.Optional;
 
 public abstract class NonEmptyStream<A> implements Stream<A> {
@@ -8,6 +9,7 @@ public abstract class NonEmptyStream<A> implements Stream<A> {
     private final A head;
 
     protected NonEmptyStream(final A head) {
+        Objects.requireNonNull(head);
         this.head = head;
     }
 

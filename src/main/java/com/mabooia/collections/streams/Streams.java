@@ -80,7 +80,10 @@ public final class Streams {
         }
 
         for (int idx = array.length - 1; idx >= 0; idx--) {
-            res = of(array[idx], res);
+            final A item = array[idx];
+            if (item != null) {
+                res = of(item, res);
+            }
         }
 
         return res;
@@ -142,7 +145,12 @@ public final class Streams {
                                 final Function<? super A, B> f) {
         return of(() -> stream
             .getHeadIfPresent()
-            .map(head -> of(f.apply(head), () -> map(stream.getTail(), f)))
+            .map(head -> of(() ->
+                Optional
+                    .ofNullable(f.apply(head))
+                    .map(notNullHead -> of(notNullHead, () -> map(stream.getTail(), f)))
+                    .orElseGet(() -> map(stream.getTail(), f))
+            ))
             .orElseGet(Streams::emptyStream)
         );
     }
